@@ -2,10 +2,8 @@ package com.example.secondar
 
 import android.net.Uri
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
 import android.widget.Button
-import android.widget.Toast
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -18,44 +16,34 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.secondar.gestures.CustomGestureDetector
 import com.example.secondar.gestures.CustomOnGestureListener
 import com.example.secondar.gestures.IGesture
-import com.google.ar.core.Anchor
-import com.google.ar.core.Frame
+import com.example.secondar.models.Product
 import com.google.ar.core.HitResult
 import com.google.ar.core.Plane
-import com.google.ar.core.Trackable
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.Node
+import com.google.ar.sceneform.Scene
 import com.google.ar.sceneform.assets.RenderableSource
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.ux.ArFragment
-import com.google.ar.sceneform.ux.TransformableNode
-import java.lang.Long.parseLong
 import java.lang.Long.valueOf
 
-import java.util.ArrayList
 import java.util.LinkedHashMap
 
 class MainActivity : AppCompatActivity(), IFurniture, IGesture {
 
     private lateinit var arFragment: ArFragment
     private val anchorsMap = LinkedHashMap<Long, AnchorNode?>()
-    private var anchorNode: AnchorNode? = null
     private lateinit var btnRemove: Button
 
     private val pointer = PointerDrawable()
     private var isTracking: Boolean = false
     private var isHitting: Boolean = false
-    private var nodeIndexToDelete: Long = 0
-    private var nodeToDelete: Node? = null
 
     private lateinit var mGestureDetector: CustomGestureDetector
-    private lateinit var mViewTouchListener: Node.OnTouchListener
     private lateinit var gestureListener: CustomOnGestureListener
-
     private lateinit var viewModel: ArViewModel
-
-    private val ASSET_3D = "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Duck/glTF/Duck.gltf"
+    private lateinit var scene: Scene
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,24 +51,19 @@ class MainActivity : AppCompatActivity(), IFurniture, IGesture {
 
         arFragment = supportFragmentManager.findFragmentById(R.id.fragment) as ArFragment
 
+        scene = arFragment.arSceneView.scene
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory {
+            ArViewModel(anchorsMap, arFragment.transformationSystem, scene)
+        }).get(ArViewModel::class.java)
+
         gestureListener = CustomOnGestureListener(this)
         mGestureDetector = CustomGestureDetector(this, gestureListener)
         mGestureDetector.setOnDoubleTapListener(gestureListener)
 
-        mViewTouchListener = Node.OnTouchListener { hitTestResult, event ->
-            if (mGestureDetector.onTouchEvent(event)) {
-                nodeToDelete = hitTestResult.node
+        viewModel.listenForModelUserInteraction(mGestureDetector)
 
-                nodeToDelete?.let { node ->
-                    node.name.let { nodeIndexToDelete = parseLong(node.name)  }
-                }
-
-                return@OnTouchListener true
-            }
-            false
-        }
-
-        arFragment.arSceneView.scene.addOnUpdateListener { frameTime ->
+        scene.addOnUpdateListener { frameTime ->
             arFragment.onUpdate(frameTime)
             onUpdate()
         }
@@ -88,15 +71,49 @@ class MainActivity : AppCompatActivity(), IFurniture, IGesture {
         btnRemove = findViewById(R.id.remove)
         initiateRecyclerView()
 
-        btnRemove.setOnClickListener { view -> removeAnchorNode() }
+        btnRemove.setOnClickListener { view -> viewModel.removeAllModels() }
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory {
-            ArViewModel(anchorNode, anchorsMap, arFragment.transformationSystem, mViewTouchListener, gestureListener)
-        }).get(ArViewModel::class.java)
-
-        // Observer for the Game finished event
-        viewModel.eventGameFinish.observe(this, Observer<Boolean> { hasFinished ->
-            System.out.println("_xyz hasFinished = $hasFinished")
+        // Observer for key update
+        viewModel.setNodeNameLiveData.observe(this, Observer<Long> { key ->
+            System.out.println("_xyz setNodeNameLiveData.observe")
+            gestureListener.nodeList[key] = gestureListener.nodeList.size
+        })
+        viewModel.anchorNodeIntoSceneLiveData.observe(this, Observer<AnchorNode> { anchorNode ->
+            System.out.println("_xyz anchorNodeIntoSceneLiveData.observe")
+            scene.addChild(anchorNode)
+        })
+        viewModel.removeNodeNameLiveData.observe(this, Observer<Long> { nodeIndexToDelete ->
+            System.out.println("_xyz removeNodeNameLiveData.observe")
+            gestureListener.nodeList.remove(nodeIndexToDelete)
+        })
+        viewModel.loadModelLiveData.observe(this, Observer<Product> { product ->
+            System.out.println("_xyz loadModelLiveData.observe")
+            if (product.modelsName.startsWith("https")) {
+                ModelRenderable
+                        .builder()
+                        .setSource(
+                                this,
+                                RenderableSource
+                                        .builder()
+                                        .setSource(this, Uri.parse(product.modelsName), RenderableSource.SourceType.GLTF2)
+                                        .setScale(0.75f)  // Scale the original model to 50%.
+                                        .setRecenterMode(RenderableSource.RecenterMode.ROOT)
+                                        .build()
+                        )
+                        .setRegistryId(product.modelsName)
+                        .build()
+                        .thenAccept { modelRenderable ->
+                            viewModel.addAnchorToScene(product.anchor, modelRenderable)
+                        }
+                        .exceptionally { throwable ->
+                            null
+                        }
+            } else {
+                ModelRenderable.builder()
+                        .setSource(this, Uri.parse(product.modelsName))
+                        .build()
+                        .thenAccept { modelRenderable -> viewModel.addAnchorToScene(product.anchor, modelRenderable) }
+            }
         })
     }
 
@@ -155,110 +172,13 @@ class MainActivity : AppCompatActivity(), IFurniture, IGesture {
         recyclerView.adapter = adapter
     }
 
-    override fun onClickType(modelName: String) {
-        addObject(modelName)
-    }
-
-    private fun addObject(modelName: String) {
+    override fun onModelItemClick(modelName: String) {
         val frame = arFragment.arSceneView.arFrame
-        val pt = screenCenter
-        val hits: List<HitResult>
-        if (frame != null) {
-            hits = frame.hitTest(pt.x.toFloat(), pt.y.toFloat())
-            for (hit in hits) {
-                val trackable = hit.trackable
-                if (trackable is Plane && trackable.isPoseInPolygon(hit.hitPose)) {
-                    loadModel(hit.createAnchor(), modelName)
-                    break
-                }
-            }
-        }
-    }
-
-    private fun loadModel(anchor: Anchor, modelName: String) {
-        /* When you build a Renderable, Sceneform loads model and related resources
-         * in the background while returning a CompletableFuture.
-         * Call thenAccept(), handle(), or check isDone() before calling get().
-         */
-        if (modelName.startsWith("https")) {
-            ModelRenderable
-                    .builder()
-                    .setSource(
-                            this,
-                            RenderableSource
-                                    .builder()
-                                    .setSource(this, Uri.parse(modelName), RenderableSource.SourceType.GLTF2)
-                                    .setScale(0.75f)  // Scale the original model to 50%.
-                                    .setRecenterMode(RenderableSource.RecenterMode.ROOT)
-                                    .build()
-                    )
-                    .setRegistryId(modelName)
-                    .build()
-                    .thenAccept { modelRenderable -> addAnchorToScene(anchor, modelRenderable) }
-                    .exceptionally { throwable ->
-                        val toast = Toast.makeText(this, "Unable to load renderable $ASSET_3D", Toast.LENGTH_LONG)
-                        toast.setGravity(Gravity.CENTER, 0, 0)
-                        toast.show()
-                        null
-                    }
-        } else {
-            ModelRenderable.builder()
-                    .setSource(this, Uri.parse(modelName))
-                    .build()
-                    .thenAccept { modelRenderable -> addAnchorToScene(anchor, modelRenderable) }
-        }
-    }
-
-    private fun addAnchorToScene(anchor: Anchor, modelRenderable: ModelRenderable) {
-        val key = System.currentTimeMillis()
-
-        anchorNode = AnchorNode(anchor)
-        anchorsMap[key] = anchorNode
-
-        val node = TransformableNode(arFragment.transformationSystem)
-        node.setParent(anchorNode)
-        node.name = "" + key
-        node.renderable = modelRenderable
-        node.select()
-        node.setOnTouchListener(mViewTouchListener)
-
-        gestureListener.nodeList[key] = gestureListener.nodeList.size
-        arFragment.arSceneView.scene.addChild(anchorNode)
-    }
-
-    private fun removeAnchorNode() {
-        nodeIndexToDelete = 0L
-        val iter = anchorsMap.entries.iterator()
-        while (iter.hasNext()) {
-            val entry = iter.next()
-            var node: Node? = entry.value!!.children[0]
-            if (node != null) {
-                arFragment.arSceneView.scene.removeChild(node)
-                entry.value?.anchor!!.detach()
-                entry.value?.setParent(null)
-                iter.remove()
-                node = null
-            }
-            gestureListener.nodeList.remove(nodeIndexToDelete)
-            nodeIndexToDelete++
-        }
-        nodeIndexToDelete = -1L
+        frame?.let { viewModel.addObject(modelName, it, screenCenter) }
     }
 
     override fun onLongPressItem() {
-        viewModel.onGameFinishComplete()
-        nodeToDelete?.let { childNode ->
-            arFragment.arSceneView.scene.removeChild(childNode)
-            anchorsMap[valueOf(childNode.name)]?.let { anchorNode ->
-                anchorNode.removeChild(childNode)
-                anchorNode.anchor?.detach()
-                anchorNode.setParent(null)
-            }
-            anchorsMap.remove(valueOf(childNode.name))
-            nodeToDelete = null
-            gestureListener.nodeList.remove(nodeIndexToDelete)
-            nodeIndexToDelete = -1L
-        }
+        viewModel.removeModel()
     }
 
     protected inline fun <VM : ViewModel> viewModelFactory(crossinline f: () -> VM) =

@@ -1,5 +1,5 @@
 package com.example.secondar
 
 interface IFurniture {
-    fun onClickType(modelName: String)
+    fun onModelItemClick(modelName: String)
 }

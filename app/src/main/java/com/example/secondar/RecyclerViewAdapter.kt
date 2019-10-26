@@ -21,7 +21,7 @@ class RecyclerViewAdapter(private val productsList: ArrayList<Product>, private 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.imageView.setImageResource(productsList[position].imagesPath)
         holder.textView.text = productsList[position].textNames
-        holder.imageView.setOnClickListener { view -> furniture.onClickType(productsList[position].modelsName) }
+        holder.imageView.setOnClickListener { view -> furniture.onModelItemClick(productsList[position].modelsName) }
     }
 
     override fun getItemCount(): Int {

@@ -35,7 +35,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.imageView.setImageResource(imagesPath.get(position));
         holder.textView.setText(textNames.get(position));
-        holder.imageView.setOnClickListener(view -> furniture.onClickType(position));
+        holder.imageView.setOnClickListener(view -> furniture.onClickType(modelNames.get(position)));
     }
 
     @Override

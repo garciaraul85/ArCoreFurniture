@@ -28,9 +28,10 @@ import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements IFurniture, IGesture {
 
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements IFurniture, IGest
     private ArrayList<Integer> imagesPath = new ArrayList<Integer>();
     private ArrayList<String> namesPath = new ArrayList<>();
     private ArrayList<String> modelNames = new ArrayList<>();
-    private LinkedHashMap<Long, AnchorNode> anchorsList = new LinkedHashMap<>();
+    private LinkedHashMap<Long, AnchorNode> anchorsMap = new LinkedHashMap<>();
     private AnchorNode anchorNode;
     private Button btnRemove;
 
@@ -68,8 +69,9 @@ public class MainActivity extends AppCompatActivity implements IFurniture, IGest
         mViewTouchListener = (v, event) -> {
             if (mGestureDetector.onTouchEvent(event)) {
                 nodeToDelete = v.getNode();
-                nodeIndexToDelete = Long.parseLong(v.getNode().getName());
-                System.out.println("_xyz node to delete: " + v.getNode().getName());
+                if (nodeToDelete != null && nodeToDelete.getName() != null) {
+                    nodeIndexToDelete = Long.parseLong(nodeToDelete.getName());
+                }
                 return true;
             }
             return false;
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements IFurniture, IGest
         btnRemove = findViewById(R.id.remove);
         getImages();
 
-        btnRemove.setOnClickListener(view -> removeAnchorNode(anchorNode));
+        btnRemove.setOnClickListener(view -> removeAnchorNode());
     }
 
     private void onUpdate() {
@@ -156,41 +158,15 @@ public class MainActivity extends AppCompatActivity implements IFurniture, IGest
         modelNames.add("cloth.sfb");
         modelNames.add(ASSET_3D);
 
-        initiateRecyclerview();
+        initiateRecyclerView();
     }
 
-    private void initiateRecyclerview() {
+    private void initiateRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(layoutManager);
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(namesPath, imagesPath, modelNames, this);
         recyclerView.setAdapter(adapter);
-    }
-
-    private void addModelToScene(Anchor anchor, ModelRenderable modelRenderable) {
-        Long key = System.currentTimeMillis();
-
-        anchorNode = new AnchorNode(anchor);
-        anchorsList.put(key, anchorNode);
-
-        TransformableNode node = new TransformableNode(arFragment.getTransformationSystem());
-        node.setParent(anchorNode);
-        node.setName("" + key);
-        node.setRenderable(modelRenderable);
-        node.select();
-        node.setOnTouchListener(mViewTouchListener);
-
-        gestureListener.nodeList.put(key, gestureListener.nodeList.size());
-        arFragment.getArSceneView().getScene().addChild(anchorNode);
-    }
-
-    public void removeAnchorNode(AnchorNode nodeToremove) {
-        if (nodeToremove != null) {
-            arFragment.getArSceneView().getScene().removeChild(nodeToremove);
-            nodeToremove.getAnchor().detach();
-            nodeToremove.setParent(null);
-            nodeToremove = null;
-        }
     }
 
     private android.graphics.Point getScreenCenter() {
@@ -199,11 +175,11 @@ public class MainActivity extends AppCompatActivity implements IFurniture, IGest
     }
 
     @Override
-    public void onClickType(int position) {
-        addObject(modelNames.get(position));
+    public void onClickType(String modelName) {
+        addObject(modelName);
     }
 
-    private void addObject(String model) {
+    private void addObject(String modelName) {
         Frame frame = arFragment.getArSceneView().getArFrame();
         android.graphics.Point pt = getScreenCenter();
         List<HitResult> hits;
@@ -213,33 +189,33 @@ public class MainActivity extends AppCompatActivity implements IFurniture, IGest
                 Trackable trackable = hit.getTrackable();
                 if (trackable instanceof Plane &&
                         ((Plane) trackable).isPoseInPolygon(hit.getHitPose())) {
-                    loadModel(hit.createAnchor(), model);
+                    loadModel(hit.createAnchor(), modelName);
                     break;
                 }
             }
         }
     }
 
-    private void loadModel(Anchor anchor, String model) {
+    private void loadModel(Anchor anchor, String modelName) {
         /* When you build a Renderable, Sceneform loads model and related resources
          * in the background while returning a CompletableFuture.
          * Call thenAccept(), handle(), or check isDone() before calling get().
          */
-        if (model.startsWith("https")) {
+        if (modelName.startsWith("https")) {
             ModelRenderable
                     .builder()
                     .setSource(
                     this,
                             RenderableSource
                                     .builder()
-                                    .setSource(this, Uri.parse(model), RenderableSource.SourceType.GLTF2)
+                                    .setSource(this, Uri.parse(modelName), RenderableSource.SourceType.GLTF2)
                                     .setScale(0.75f)  // Scale the original model to 50%.
                                     .setRecenterMode(RenderableSource.RecenterMode.ROOT)
                                     .build()
                     )
-                    .setRegistryId(model)
+                    .setRegistryId(modelName)
                     .build()
-                    .thenAccept(modelRenderable -> addModelToScene(anchor, modelRenderable))
+                    .thenAccept(modelRenderable -> addAnchorToScene(anchor, modelRenderable))
                     .exceptionally(
                             throwable -> {
                                 Toast toast =
@@ -252,24 +228,57 @@ public class MainActivity extends AppCompatActivity implements IFurniture, IGest
                     );
         } else {
             ModelRenderable.builder()
-                    .setSource(this, Uri.parse(model))
+                    .setSource(this, Uri.parse(modelName))
                     .build()
-                    .thenAccept(modelRenderable -> addModelToScene(anchor, modelRenderable));
+                    .thenAccept(modelRenderable -> addAnchorToScene(anchor, modelRenderable));
         }
+    }
+
+    private void addAnchorToScene(Anchor anchor, ModelRenderable modelRenderable) {
+        Long key = System.currentTimeMillis();
+
+        anchorNode = new AnchorNode(anchor);
+        anchorsMap.put(key, anchorNode);
+
+        TransformableNode node = new TransformableNode(arFragment.getTransformationSystem());
+        node.setParent(anchorNode);
+        node.setName("" + key);
+        node.setRenderable(modelRenderable);
+        node.select();
+        node.setOnTouchListener(mViewTouchListener);
+
+        gestureListener.nodeList.put(key, gestureListener.nodeList.size());
+        arFragment.getArSceneView().getScene().addChild(anchorNode);
+    }
+
+    public void removeAnchorNode() {
+        nodeIndexToDelete = 0L;
+        Iterator<Map.Entry<Long, AnchorNode>> iter = anchorsMap.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<Long, AnchorNode> entry = iter.next();
+            Node node = entry.getValue().getChildren().get(0);
+            arFragment.getArSceneView().getScene().removeChild(node);
+            entry.getValue().getAnchor().detach();
+            entry.getValue().setParent(null);
+            iter.remove();
+            node = null;
+            gestureListener.nodeList.remove(nodeIndexToDelete);
+            nodeIndexToDelete++;
+        }
+        nodeIndexToDelete = -1L;
     }
 
     @Override
     public void onLongPressItem() {
         if (nodeToDelete != null) {
-            System.out.println("_xyz Anchor = " + anchorNode.getName());
-            System.out.println("_xyz nodeToDelete = " + nodeToDelete.getName());
-            System.out.println("_xyz Long press : Delete = " + nodeIndexToDelete + ", " + gestureListener.nodeList);
             arFragment.getArSceneView().getScene().removeChild(nodeToDelete);
-            anchorsList.get(Long.parseLong(nodeToDelete.getName())).removeChild(nodeToDelete);
+            anchorsMap.get(Long.parseLong(nodeToDelete.getName())).removeChild(nodeToDelete);
+            anchorsMap.get(Long.parseLong(nodeToDelete.getName())).getAnchor().detach();
+            anchorsMap.get(Long.parseLong(nodeToDelete.getName())).setParent(null);
+            anchorsMap.remove(Long.valueOf(nodeToDelete.getName()));
             nodeToDelete = null;
             gestureListener.nodeList.remove(nodeIndexToDelete);
             nodeIndexToDelete = -1L;
-            System.out.println("_xyz Long press : Pending Nodes to Delete = " + nodeIndexToDelete + ", " + gestureListener.nodeList);
         }
     }
 }

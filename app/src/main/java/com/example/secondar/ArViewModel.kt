@@ -20,8 +20,6 @@ class ArViewModel(val transformationSystem: TransformationSystem, val scene: Sce
     private lateinit var mViewTouchListener: Node.OnTouchListener
     private var nodeToDelete: Node? = null
     private var nodeIndexToDelete: Long = 0
-    private var isHitting: Boolean = false
-    private var isTracking: Boolean = false
 
     private val anchorNodeIntoSceneMutableLiveData = MutableLiveData<AnchorNode>()
     val anchorNodeIntoSceneLiveData: LiveData<AnchorNode>
@@ -123,29 +121,4 @@ class ArViewModel(val transformationSystem: TransformationSystem, val scene: Sce
             nodeIndexToDelete = -1L
         }
     }
-
-    fun updateTracking(frame: Frame?): Boolean {
-        val wasTracking = isTracking
-        isTracking = frame?.camera?.trackingState == TrackingState.TRACKING
-        return isTracking != wasTracking
-    }
-
-    fun updateHitTest(frame: Frame?, screenCenter: Point): Boolean {
-        val pt = screenCenter
-        val hits: List<HitResult>
-        val wasHitting = isHitting
-        isHitting = false
-        frame?.let {
-            hits = it.hitTest(pt.x.toFloat(), pt.y.toFloat())
-            for (hit in hits) {
-                val trackable = hit.trackable
-                if (trackable is Plane && trackable.isPoseInPolygon(hit.hitPose)) {
-                    isHitting = true
-                    break
-                }
-            }
-        }
-        return wasHitting != isHitting
-    }
-
 }

@@ -4,7 +4,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -12,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-
 import com.example.secondar.gestures.CustomGestureDetector
 import com.example.secondar.gestures.CustomOnGestureListener
 import com.example.secondar.gestures.IGesture
@@ -21,19 +19,14 @@ import com.google.ar.core.HitResult
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.AnchorNode
-import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.Scene
 import com.google.ar.sceneform.assets.RenderableSource
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.ux.ArFragment
-import java.lang.Long.valueOf
-
-import java.util.LinkedHashMap
 
 class MainActivity : AppCompatActivity(), IFurniture, IGesture {
 
     private lateinit var arFragment: ArFragment
-    private val anchorsMap = LinkedHashMap<Long, AnchorNode?>()
     private lateinit var btnRemove: Button
 
     private val pointer = PointerDrawable()
@@ -49,14 +42,22 @@ class MainActivity : AppCompatActivity(), IFurniture, IGesture {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        arFragment = supportFragmentManager.findFragmentById(R.id.fragment) as ArFragment
+        viewModelAndArCoreSetup()
+        arCorListenersSetup()
+        btnRemoveSetup()
+        modelsAnchorsAndNodesObserver()
+    }
 
+    private fun viewModelAndArCoreSetup() {
+        arFragment = supportFragmentManager.findFragmentById(R.id.fragment) as ArFragment
         scene = arFragment.arSceneView.scene
 
         viewModel = ViewModelProviders.of(this, viewModelFactory {
-            ArViewModel(anchorsMap, arFragment.transformationSystem, scene)
+            ArViewModel(arFragment.transformationSystem, scene)
         }).get(ArViewModel::class.java)
+    }
 
+    private fun arCorListenersSetup() {
         gestureListener = CustomOnGestureListener(this)
         mGestureDetector = CustomGestureDetector(this, gestureListener)
         mGestureDetector.setOnDoubleTapListener(gestureListener)
@@ -67,23 +68,23 @@ class MainActivity : AppCompatActivity(), IFurniture, IGesture {
             arFragment.onUpdate(frameTime)
             onUpdate()
         }
+    }
 
+    private fun btnRemoveSetup() {
         btnRemove = findViewById(R.id.remove)
         initiateRecyclerView()
 
         btnRemove.setOnClickListener { view -> viewModel.removeAllModels() }
+    }
 
-        // Observer for key update
+    private fun modelsAnchorsAndNodesObserver() {
         viewModel.setNodeNameLiveData.observe(this, Observer<Long> { key ->
-            System.out.println("_xyz setNodeNameLiveData.observe")
             gestureListener.nodeList[key] = gestureListener.nodeList.size
         })
         viewModel.anchorNodeIntoSceneLiveData.observe(this, Observer<AnchorNode> { anchorNode ->
-            System.out.println("_xyz anchorNodeIntoSceneLiveData.observe")
             scene.addChild(anchorNode)
         })
         viewModel.removeNodeNameLiveData.observe(this, Observer<Long> { nodeIndexToDelete ->
-            System.out.println("_xyz removeNodeNameLiveData.observe")
             gestureListener.nodeList.remove(nodeIndexToDelete)
         })
         viewModel.loadModelLiveData.observe(this, Observer<Product> { product ->

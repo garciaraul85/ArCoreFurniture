@@ -7,12 +7,7 @@ import android.view.GestureDetector.OnDoubleTapListener
 import android.view.GestureDetector.OnGestureListener
 import android.view.MotionEvent
 import android.view.ViewConfiguration
-import android.widget.EditText
-import android.widget.TextView
-
-import java.util.ArrayList
-import java.util.LinkedHashMap
-import java.util.LinkedList
+import java.util.*
 
 class CustomOnGestureListener(context: Context) : OnGestureListener, OnDoubleTapListener {
 
@@ -169,7 +164,6 @@ class CustomOnGestureListener(context: Context) : OnGestureListener, OnDoubleTap
     }
 
     override fun onLongPress(e: MotionEvent) {
-        println("_xyz onLongPress() nodeList:$nodeList")
         gesture.onLongPressItem()
     }
 
@@ -177,13 +171,9 @@ class CustomOnGestureListener(context: Context) : OnGestureListener, OnDoubleTap
                           distanceY: Float): Boolean {
         // e1 The first down motion event that started the scrolling.
         // e2 The move motion event that triggered the current onScroll.
-        println("onScroll() ptrs:e1:" + e1.pointerCount + " e2:"
-                + e2.pointerCount + " ptrCnt: " + mPtrCount)
 
         val scroll = isScrollGesture(e2)
         val pinch = isPinchGesture(e2)
-
-        println("onScroll() scroll = $scroll pinch = $pinch")
 
         if (scroll || pinch)
             cancelAll()

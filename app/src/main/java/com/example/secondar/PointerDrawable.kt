@@ -37,9 +37,7 @@ class PointerDrawable : Drawable() {
         }
     }
 
-    override fun setAlpha(i: Int) {
-
-    }
+    override fun setAlpha(i: Int) {}
 
     override fun setColorFilter(colorFilter: ColorFilter?) {}
 

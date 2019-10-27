@@ -1,14 +1,12 @@
 package com.example.secondar
 
+import android.graphics.Point
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.secondar.gestures.CustomGestureDetector
 import com.example.secondar.models.Product
-import com.google.ar.core.Anchor
-import com.google.ar.core.Frame
-import com.google.ar.core.HitResult
-import com.google.ar.core.Plane
+import com.google.ar.core.*
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.Scene
@@ -17,11 +15,13 @@ import com.google.ar.sceneform.ux.TransformableNode
 import com.google.ar.sceneform.ux.TransformationSystem
 import java.util.LinkedHashMap
 
-class ArViewModel(val anchorsMap: LinkedHashMap<Long, AnchorNode?>, val transformationSystem: TransformationSystem, val scene: Scene): ViewModel() {
-
-    private var nodeToDelete: Node? = null
+class ArViewModel(val transformationSystem: TransformationSystem, val scene: Scene): ViewModel() {
+    private val anchorsMap = LinkedHashMap<Long, AnchorNode?>()
     private lateinit var mViewTouchListener: Node.OnTouchListener
+    private var nodeToDelete: Node? = null
     private var nodeIndexToDelete: Long = 0
+    private var isHitting: Boolean = false
+    private var isTracking: Boolean = false
 
     private val anchorNodeIntoSceneMutableLiveData = MutableLiveData<AnchorNode>()
     val anchorNodeIntoSceneLiveData: LiveData<AnchorNode>
@@ -80,7 +80,6 @@ class ArViewModel(val anchorsMap: LinkedHashMap<Long, AnchorNode?>, val transfor
                 nodeToDelete?.let { node ->
                     node.name.let {
                         nodeIndexToDelete = java.lang.Long.parseLong(node.name)
-                        System.out.println("_xyz nodeIndexToDelete = $nodeIndexToDelete")
                     }
                 }
 
@@ -123,6 +122,30 @@ class ArViewModel(val anchorsMap: LinkedHashMap<Long, AnchorNode?>, val transfor
             removeNodeNameMutableLiveData.value = nodeIndexToDelete
             nodeIndexToDelete = -1L
         }
+    }
+
+    fun updateTracking(frame: Frame?): Boolean {
+        val wasTracking = isTracking
+        isTracking = frame?.camera?.trackingState == TrackingState.TRACKING
+        return isTracking != wasTracking
+    }
+
+    fun updateHitTest(frame: Frame?, screenCenter: Point): Boolean {
+        val pt = screenCenter
+        val hits: List<HitResult>
+        val wasHitting = isHitting
+        isHitting = false
+        frame?.let {
+            hits = it.hitTest(pt.x.toFloat(), pt.y.toFloat())
+            for (hit in hits) {
+                val trackable = hit.trackable
+                if (trackable is Plane && trackable.isPoseInPolygon(hit.hitPose)) {
+                    isHitting = true
+                    break
+                }
+            }
+        }
+        return wasHitting != isHitting
     }
 
 }

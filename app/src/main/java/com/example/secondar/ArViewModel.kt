@@ -101,7 +101,6 @@ class ArViewModel(val transformationSystem: TransformationSystem, val scene: Sce
                 node = null
             }
             removeNodeNameMutableLiveData.value = nodeIndexToDelete
-            //gestureListener.nodeList.remove(nodeIndexToDelete)
             nodeIndexToDelete++
         }
         nodeIndexToDelete = -1L

@@ -31,7 +31,6 @@ class TakePicturesViewModel(app: Application): AndroidViewModel(app) {
 
     @Throws(IOException::class)
     private fun saveBitmapToDisk(bitmap: Bitmap, filename: String) {
-
         val out = File(filename)
         if (!out.parentFile.exists()) {
             out.parentFile.mkdirs()
@@ -49,7 +48,6 @@ class TakePicturesViewModel(app: Application): AndroidViewModel(app) {
             ex.printStackTrace()
             throw IOException("Failed to save bitmap to disk", ex)
         }
-
     }
 
     private fun generateFilename(): String {
@@ -75,12 +73,10 @@ class TakePicturesViewModel(app: Application): AndroidViewModel(app) {
                     saveBitmapToDisk(bitmap, filename)
                     snackbar.setAction("Open in Photos") { v ->
                         val photoFile = File(filename)
-
-                        val photoURI = FileProvider.getUriForFile(this.getApplication(),
-                                "$packageName.example.secondar.name.provider",
-                                photoFile)
-                        val intent = Intent(Intent.ACTION_VIEW, photoURI)
-                        intent.setDataAndType(photoURI, "image/*")
+                        val photoURI: Uri = FileProvider.getUriForFile(this.getApplication(), "$packageName.example.secondar.name.provider", photoFile)
+                        val intent = Intent()
+                        intent.action = Intent.ACTION_VIEW
+                        intent.setDataAndType(photoURI,"image/jpeg")
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         startActivityMutableLiveData.value = intent
                     }

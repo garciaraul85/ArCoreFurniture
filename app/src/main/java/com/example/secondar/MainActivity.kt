@@ -203,85 +203,11 @@ class MainActivity : AppCompatActivity(), IFurniture, IGesture {
         recyclerView.adapter = adapter
     }
 
-    /*fun takePicture() {
+    fun takePicture() {
         val snackbar = Snackbar.make(findViewById(android.R.id.content),
                 "Photo saved", Snackbar.LENGTH_LONG)
         takePicturesViewModel.takePhoto(arFragment.arSceneView, snackbar, getPackageName())
-    }*/
-
-    private fun generateFilename(): String {
-        val date = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date())
-        return Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES).toString() + File.separator + "Sceneform/" + date + "_screenshot.jpg"
     }
-
-    @Throws(IOException::class)
-    private fun saveBitmapToDisk(bitmap: Bitmap, filename: String) {
-
-        val out = File(filename)
-        if (!out.parentFile.exists()) {
-            out.parentFile.mkdirs()
-        }
-        try {
-            FileOutputStream(filename).use { outputStream ->
-                ByteArrayOutputStream().use { outputData ->
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputData)
-                    outputData.writeTo(outputStream)
-                    outputStream.flush()
-                    outputStream.close()
-                }
-            }
-        } catch (ex: IOException) {
-            ex.printStackTrace()
-            throw IOException("Failed to save bitmap to disk", ex)
-        }
-
-    }
-
-    private fun takePicture() {
-        val view = arFragment.arSceneView
-
-        // Create a bitmap the size of the scene view.
-        val bitmap = Bitmap.createBitmap(view.width, view.height,
-                Bitmap.Config.ARGB_8888)
-
-        // Create a handler thread to offload the processing of the image.
-        val handlerThread = HandlerThread("PixelCopier")
-        handlerThread.start()
-        // Make the request to copy.
-        PixelCopy.request(view, bitmap, { copyResult ->
-            if (copyResult == PixelCopy.SUCCESS) {
-                try {
-                    val filename = generateFilename()
-                    saveBitmapToDisk(bitmap, filename)
-                    val snackbar = Snackbar.make(findViewById(android.R.id.content),
-                            "Photo saved", Snackbar.LENGTH_LONG)
-                    snackbar.setAction("Open in Photos") { v ->
-                        val photoFile = File(filename)
-                        val photoURI: Uri = FileProvider.getUriForFile(this, "$packageName.example.secondar.name.provider", photoFile)
-                        val intent = Intent()
-                        intent.action = Intent.ACTION_VIEW
-                        intent.setDataAndType(photoURI,"image/jpeg")
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        startActivity(intent)
-                    }
-                    snackbar.show()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                    val toast = Toast.makeText(this.application, e.toString(),
-                            Toast.LENGTH_LONG)
-                    toast.show()
-                }
-            } else {
-                val toast = Toast.makeText(this.application,
-                        "Failed to copyPixels: $copyResult", Toast.LENGTH_LONG)
-                toast.show()
-            }
-            handlerThread.quitSafely()
-        }, Handler(handlerThread.looper))
-    }
-
-
 
     override fun onModelItemClick(modelName: String) {
         val frame = arFragment.arSceneView.arFrame

@@ -142,8 +142,12 @@ class MainActivity : AppCompatActivity(), IFurniture, IGesture {
             } else {
                 ModelRenderable.builder()
                         .setSource(this, Uri.parse(product.modelsName))
+                        .setRegistryId(product.modelsName)
                         .build()
                         .thenAccept { modelRenderable -> arViewModel.addAnchorToScene(product.anchor, modelRenderable) }
+                        .exceptionally { throwable ->
+                            null
+                        }
             }
         })
     }

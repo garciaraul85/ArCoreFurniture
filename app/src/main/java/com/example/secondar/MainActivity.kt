@@ -1,18 +1,17 @@
 package com.example.secondar
 
 import android.content.Intent
-import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.HandlerThread
-import android.view.PixelCopy
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -35,12 +34,12 @@ import com.google.ar.sceneform.Scene
 import com.google.ar.sceneform.assets.RenderableSource
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.ux.ArFragment
-import java.io.*
-import java.text.SimpleDateFormat
-import java.util.*
+import com.yalantis.contextmenu.lib.ContextMenuDialogFragment
+import com.yalantis.contextmenu.lib.MenuObject
+import com.yalantis.contextmenu.lib.MenuParams
+import kotlinx.android.synthetic.main.toolbar.*
 
-class MainActivity : AppCompatActivity(), IFurniture, IGesture {
-
+class MainActivity : BaseActivity(), IFurniture, IGesture {
     private lateinit var arFragment: ArFragment
     private lateinit var btnRemove: Button
     private lateinit var btnTakePicture: FloatingActionButton
@@ -58,6 +57,9 @@ class MainActivity : AppCompatActivity(), IFurniture, IGesture {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        initToolbar()
+        initMenuFragment()
 
         viewModelAndArCoreSetup()
         arCorListenersSetup()

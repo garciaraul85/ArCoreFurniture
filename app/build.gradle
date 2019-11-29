@@ -54,6 +54,9 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$archVersion"
     kapt "android.arch.lifecycle:compiler:$archVersion"
 
+    implementation 'com.github.yalantis:context-menu.android:1.1.4'
+    implementation 'com.specyci:residemenu:1.6'
+
     implementation "android.arch.lifecycle:extensions:1.1.1"
 }
 

@@ -206,7 +206,7 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
 
     private fun initContextMenuDialogFragment() {
         contextMenuDialogFragment = ContextMenuDialogFragment.newInstance(menuParams).apply {
-            menuItemClickListener = { view, position ->
+            menuItemClickListener = { _, position ->
                 when(position) {
                     1 -> {
                         adapter.updateProductList(Common.getBathroomsList())

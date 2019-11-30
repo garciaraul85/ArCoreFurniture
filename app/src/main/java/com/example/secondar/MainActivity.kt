@@ -1,20 +1,12 @@
 package com.example.secondar
 
 import android.content.Intent
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.Button
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import android.widget.TextView
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,14 +27,14 @@ import com.google.ar.sceneform.assets.RenderableSource
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.ux.ArFragment
 import com.yalantis.contextmenu.lib.ContextMenuDialogFragment
-import com.yalantis.contextmenu.lib.MenuObject
-import com.yalantis.contextmenu.lib.MenuParams
 import kotlinx.android.synthetic.main.toolbar.*
 
 class MainActivity : BaseActivity(), IFurniture, IGesture {
     private lateinit var arFragment: ArFragment
     private lateinit var btnRemove: Button
     private lateinit var btnTakePicture: FloatingActionButton
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: RecyclerViewAdapter
 
     private val pointer = PointerDrawable()
     private var isTracking: Boolean = false
@@ -53,13 +45,16 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
     private lateinit var arViewModel: ArViewModel
     private lateinit var takePicturesViewModel: TakePicturesViewModel
     private lateinit var scene: Scene
+    private lateinit var tvToolbarTitleTxt: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        initToolbar()
-        initMenuFragment()
+        tvToolbarTitleTxt = findViewById(R.id.tvToolbarTitle)
+
+        initArMenu()
+        initContextMenuDialogFragment()
 
         viewModelAndArCoreSetup()
         arCorListenersSetup()
@@ -203,10 +198,35 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
 
     private fun initiateRecyclerView() {
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
+        recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
         recyclerView.layoutManager = layoutManager
-        val adapter = RecyclerViewAdapter(Common.getProductsList(), this)
+        adapter = RecyclerViewAdapter(Common.getBathroomsList(), this)
         recyclerView.adapter = adapter
+    }
+
+    private fun initContextMenuDialogFragment() {
+        contextMenuDialogFragment = ContextMenuDialogFragment.newInstance(menuParams).apply {
+            menuItemClickListener = { view, position ->
+                when(position) {
+                    1 -> {
+                        adapter.updateProductList(Common.getBathroomsList())
+                        tvToolbarTitleTxt.text = "Bathrooms"
+                    }
+                    2 -> {
+                        adapter.updateProductList(Common.getBedsList())
+                        tvToolbarTitleTxt.text = "Beds"
+                    }
+                    3 -> {
+                        adapter.updateProductList(Common.getCasesList())
+                        tvToolbarTitleTxt.text = "Cases"
+                    }
+                    4 -> {
+                        adapter.updateProductList(Common.getChairsList())
+                        tvToolbarTitleTxt.text = "Chairs"
+                    }
+                }
+            }
+        }
     }
 
     fun takePicture() {
@@ -223,11 +243,6 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
     override fun onLongPressItem() {
         arViewModel.removeModel()
     }
-
-    protected inline fun <VM : ViewModel> viewModelFactory(crossinline f: () -> VM) =
-            object : ViewModelProvider.Factory {
-                override fun <T : ViewModel> create(modelClass: Class<T>): T = f() as T
-            }
 
     private val screenCenter: android.graphics.Point
         get() {

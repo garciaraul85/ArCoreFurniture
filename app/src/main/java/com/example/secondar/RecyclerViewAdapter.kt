@@ -9,6 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.secondar.models.Product
 
 import java.util.ArrayList
+import android.R.attr.data
+import android.text.method.TextKeyListener.clear
+
+
 
 class RecyclerViewAdapter(private val productsList: ArrayList<Product>, private val furniture: IFurniture)
     : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
@@ -22,6 +26,12 @@ class RecyclerViewAdapter(private val productsList: ArrayList<Product>, private 
         holder.imageView.setImageResource(productsList[position].imagesPath)
         holder.textView.text = productsList[position].textNames
         holder.imageView.setOnClickListener { view -> furniture.onModelItemClick(productsList[position].modelsName) }
+    }
+
+    fun updateProductList(datas: ArrayList<Product>) {
+        productsList.clear()
+        productsList.addAll(datas)
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {

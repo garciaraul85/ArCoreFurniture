@@ -1,40 +1,10 @@
 package com.example.secondar.feature.menu
 
-import android.content.res.Resources
 import androidx.lifecycle.ViewModel
 import com.example.secondar.R
-import com.yalantis.contextmenu.lib.ContextMenuDialogFragment
 import com.yalantis.contextmenu.lib.MenuObject
-import com.yalantis.contextmenu.lib.MenuParams
 
-class MenuViewModel(var contextMenuDialogFragment: ContextMenuDialogFragment, var resources: Resources): ViewModel() {
-
-    /**
-     * If you want to change the side you need to add 'gravity' parameter,
-     * by default it is MenuGravity.END.
-     *
-     * For example:
-     *
-     * MenuParams(
-     *     actionBarSize = resources.getDimension(R.dimen.tool_bar_height).toInt(),
-     *     menuObjects = getMenuObjects(),
-     *     isClosableOutside = false,
-     *     gravity = MenuGravity.START
-     * )
-     */
-    fun initMenuFragment() {
-        val menuParams = MenuParams(
-                actionBarSize = resources.getDimension(R.dimen.tool_bar_height).toInt(),
-                menuObjects = getMenuObjects(),
-                isClosableOutside = false
-        )
-
-        contextMenuDialogFragment = ContextMenuDialogFragment.newInstance(menuParams).apply {
-            menuItemClickListener = { view, position ->
-                System.out.println("Clicked on position: $position")
-            }
-        }
-    }
+class MenuViewModel(): ViewModel() {
 
     /**
      * You can use any (drawable, resource, bitmap, color) as image:
@@ -57,7 +27,7 @@ class MenuViewModel(var contextMenuDialogFragment: ContextMenuDialogFragment, va
      * You can set any (color) as divider color:
      * menuObject.dividerColor = ...
      */
-    private fun getMenuObjects() = mutableListOf<MenuObject>().apply {
+    fun getMenuObjects(): MutableList<MenuObject> = mutableListOf<MenuObject>().apply {
         val close = MenuObject().apply { setResourceValue(R.drawable.icn_close) }
         val bathroom = MenuObject("Bathroom").apply { setResourceValue(R.drawable.icn_1) }
         val beds = MenuObject("Beds").apply { setResourceValue(R.drawable.icn_2) }

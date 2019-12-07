@@ -27,7 +27,6 @@ import com.google.ar.sceneform.assets.RenderableSource
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.ux.ArFragment
 import com.yalantis.contextmenu.lib.ContextMenuDialogFragment
-import kotlinx.android.synthetic.main.toolbar.*
 
 class MainActivity : BaseActivity(), IFurniture, IGesture {
     private lateinit var arFragment: ArFragment

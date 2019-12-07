@@ -40,8 +40,6 @@ class MenuViewModel(): ViewModel() {
         val kitchen = MenuObject("Kitchen").apply { setResourceValue(R.drawable.icn_4) }
         val outside = MenuObject("Outside").apply { setResourceValue(R.drawable.icn_5) }
         val tables = MenuObject("Tables").apply { setResourceValue(R.drawable.icn_1) }
-        val pictures = MenuObject("Take picture").apply { setResourceValue(R.drawable.icn_2) }
-        val remove = MenuObject("Remove all Items").apply { setResourceValue(R.drawable.icn_3) }
 
         add(close)
         add(bathroom)
@@ -56,7 +54,5 @@ class MenuViewModel(): ViewModel() {
         add(kitchen)
         add(outside)
         add(tables)
-        add(pictures)
-        add(remove)
     }
 }

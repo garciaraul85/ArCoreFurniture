@@ -1,0 +1,68 @@
+{
+  "category" : [
+    {
+      "name": "Bathroom",
+      "icon": "icn_1",
+      "products": [
+        {
+          "name": "Sink",
+          "icon": "table",
+          "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/bathrooms/sink1/sink01.gltf"
+        },
+        {
+          "name": "Shower",
+          "icon": "bookshelf",
+          "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/bathrooms/shower1/shower01.gltf"
+        }
+      ]
+    },
+    {
+      "name": "Beds",
+      "icon": "icn_2",
+      "products": [
+        {
+          "name": "Bed01",
+          "icon": "lamp",
+          "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/beds/bed1/bed01.gltf"
+        },
+        {
+          "name": "Shower",
+          "icon": "odltv",
+          "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/beds/bed4/bed04.gltf"
+        }
+      ]
+    },
+    {
+      "name": "Cases",
+      "icon": "icn_3",
+      "products": [
+        {
+          "name": "Bed01",
+          "icon": "clothdryer",
+          "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/cases/bookshelf1/bookshelf01.gltf"
+        },
+        {
+          "name": "Shower",
+          "icon": "chair",
+          "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/cases/bookcase2/bookcase2.gltf"
+        }
+      ]
+    },
+    {
+      "name": "Tables",
+      "icon": "icn_4",
+      "products": [
+        {
+          "name": "Table01",
+          "icon": "clothdryer",
+          "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/tables/table1/table01.gltf"
+        },
+        {
+          "name": "Table02",
+          "icon": "chair",
+          "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/tables/table2/table02.gltf"
+        }
+      ]
+    }
+  ]
+}

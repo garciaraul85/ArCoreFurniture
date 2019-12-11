@@ -2,6 +2,7 @@ package com.example.secondar
 
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,8 @@ import androidx.lifecycle.ViewModelProviders
 import com.example.secondar.feature.menu.MenuViewModel
 import com.yalantis.contextmenu.lib.ContextMenuDialogFragment
 import com.yalantis.contextmenu.lib.MenuParams
+import androidx.lifecycle.Observer
+import com.yalantis.contextmenu.lib.MenuObject
 import kotlinx.android.synthetic.main.toolbar.*
 
 open class BaseActivity: AppCompatActivity() {
@@ -17,13 +20,15 @@ open class BaseActivity: AppCompatActivity() {
     private lateinit var mContext: BaseActivity
     private lateinit var mTopToolbar: Toolbar
     lateinit var contextMenuDialogFragment: ContextMenuDialogFragment
+    lateinit var toolbarTitleTxt: TextView
 
     private lateinit var menuViewModel: MenuViewModel
     lateinit var menuParams: MenuParams
 
     fun initArMenu() {
+        toolbarTitleTxt = findViewById(R.id.toolbarTitle)
         menuViewModel = ViewModelProviders.of(this, viewModelFactory {
-            MenuViewModel()
+            MenuViewModel(application)
         }).get(MenuViewModel::class.java)
 
         initToolbar()
@@ -67,7 +72,7 @@ open class BaseActivity: AppCompatActivity() {
             setNavigationOnClickListener { onBackPressed() }
         }
 
-        tvToolbarTitle.text = "PAD"
+        toolbarTitle.text = "PAD"
     }
 
     override fun onBackPressed() {
@@ -98,11 +103,24 @@ open class BaseActivity: AppCompatActivity() {
      * )
      */
     private fun initMenuFragment() {
-        menuParams = MenuParams(
-                actionBarSize = resources.getDimension(R.dimen.tool_bar_height).toInt(),
-                menuObjects = menuViewModel.getMenuObjects(),
-                isClosableOutside = false
-        )
+        menuViewModel.categoriesLiveData.observe(this, Observer<MutableList<MenuObject>> { menu ->
+            menuParams = MenuParams(
+                    actionBarSize = resources.getDimension(R.dimen.tool_bar_height).toInt(),
+                    menuObjects = menu,
+                    isClosableOutside = false
+            )
+            initContextMenuDialogFragment(menu)
+        })
+
+        menuViewModel.getArMenuCategories()
+    }
+
+    private fun initContextMenuDialogFragment(menu: MutableList<MenuObject>) {
+        contextMenuDialogFragment = ContextMenuDialogFragment.newInstance(menuParams).apply {
+            menuItemClickListener = { _, position ->
+                toolbarTitleTxt.text = menu[position].title
+            }
+        }
     }
 
     protected inline fun <VM : ViewModel> viewModelFactory(crossinline f: () -> VM) =

@@ -44,16 +44,12 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
     private lateinit var arViewModel: ArViewModel
     private lateinit var takePicturesViewModel: TakePicturesViewModel
     private lateinit var scene: Scene
-    private lateinit var tvToolbarTitleTxt: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        tvToolbarTitleTxt = findViewById(R.id.tvToolbarTitle)
-
         initArMenu()
-        initContextMenuDialogFragment()
+//        initContextMenuDialogFragment()
 
         viewModelAndArCoreSetup()
         arCorListenersSetup()
@@ -203,30 +199,30 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
         recyclerView.adapter = adapter
     }
 
-    private fun initContextMenuDialogFragment() {
+    /*private fun initContextMenuDialogFragment() {
         contextMenuDialogFragment = ContextMenuDialogFragment.newInstance(menuParams).apply {
             menuItemClickListener = { _, position ->
                 when(position) {
                     1 -> {
                         adapter.updateProductList(Common.getBathroomsList())
-                        tvToolbarTitleTxt.text = "Bathrooms"
+                        toolbarTitleTxt.text = "Bathrooms"
                     }
                     2 -> {
                         adapter.updateProductList(Common.getBedsList())
-                        tvToolbarTitleTxt.text = "Beds"
+                        toolbarTitleTxt.text = "Beds"
                     }
                     3 -> {
                         adapter.updateProductList(Common.getCasesList())
-                        tvToolbarTitleTxt.text = "Cases"
+                        toolbarTitleTxt.text = "Cases"
                     }
                     4 -> {
                         adapter.updateProductList(Common.getChairsList())
-                        tvToolbarTitleTxt.text = "Chairs"
+                        toolbarTitleTxt.text = "Chairs"
                     }
                 }
             }
         }
-    }
+    }*/
 
     fun takePicture() {
         val snackbar = Snackbar.make(findViewById(android.R.id.content),

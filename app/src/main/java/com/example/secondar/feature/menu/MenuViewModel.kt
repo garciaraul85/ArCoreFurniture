@@ -7,9 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.secondar.R
 import com.example.secondar.feature.menu.data.ApiService
-import com.example.secondar.feature.menu.models.Category
 import com.example.secondar.util.UtilMethods
-import com.google.ar.sceneform.AnchorNode
 import com.yalantis.contextmenu.lib.MenuObject
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -78,17 +76,12 @@ class MenuViewModel(app: Application): AndroidViewModel(app) {
         if (UtilMethods.isConnectedToInternet(this.getApplication())) {
             //UtilMethods.showLoading(this.getApplication())
             val observable = ApiService.userApiCall().getMenu()
-
             observable.subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ userResponse ->
                             //UtilMethods.hideLoading()
                             userResponse.files.forEach { categories ->
                                 this.categories.add(MenuObject(categories.name).apply { setResourceValue(R.drawable.icn_1) })
-                                //println("_xyz Name = " + categories.name + ", Icon = " + categories.icon)
-                                categories.products.forEach { products ->
-                                    println("_xyz Name = " + products.name + ", Icon = " + products.icon + ", Url = " + products.url)
-                                }
                             }
                             this.categories.let {
                                 this.categoriesMutableLiveData.value = this.categories

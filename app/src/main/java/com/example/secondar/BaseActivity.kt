@@ -5,13 +5,10 @@ import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.*
 import com.example.secondar.feature.menu.MenuViewModel
 import com.yalantis.contextmenu.lib.ContextMenuDialogFragment
 import com.yalantis.contextmenu.lib.MenuParams
-import androidx.lifecycle.Observer
 import com.yalantis.contextmenu.lib.MenuObject
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -24,6 +21,10 @@ open class BaseActivity: AppCompatActivity() {
 
     private lateinit var menuViewModel: MenuViewModel
     lateinit var menuParams: MenuParams
+
+    private val menuOptionSelectedMutableLiveData = MutableLiveData<Int>()
+    val menuOptionSelectedLiveData: LiveData<Int>
+        get() = menuOptionSelectedMutableLiveData
 
     fun initArMenu() {
         toolbarTitleTxt = findViewById(R.id.toolbarTitle)
@@ -119,6 +120,7 @@ open class BaseActivity: AppCompatActivity() {
         contextMenuDialogFragment = ContextMenuDialogFragment.newInstance(menuParams).apply {
             menuItemClickListener = { _, position ->
                 toolbarTitleTxt.text = menu[position].title
+                menuOptionSelectedMutableLiveData.value = position
             }
         }
     }

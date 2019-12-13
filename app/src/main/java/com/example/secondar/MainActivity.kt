@@ -49,8 +49,7 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initArMenu()
-//        initContextMenuDialogFragment()
-
+        listenMenuSelection()
         viewModelAndArCoreSetup()
         arCorListenersSetup()
         btnSetup()
@@ -199,35 +198,33 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
         recyclerView.adapter = adapter
     }
 
-    /*private fun initContextMenuDialogFragment() {
-        contextMenuDialogFragment = ContextMenuDialogFragment.newInstance(menuParams).apply {
-            menuItemClickListener = { _, position ->
-                when(position) {
-                    1 -> {
-                        adapter.updateProductList(Common.getBathroomsList())
-                        toolbarTitleTxt.text = "Bathrooms"
-                    }
-                    2 -> {
-                        adapter.updateProductList(Common.getBedsList())
-                        toolbarTitleTxt.text = "Beds"
-                    }
-                    3 -> {
-                        adapter.updateProductList(Common.getCasesList())
-                        toolbarTitleTxt.text = "Cases"
-                    }
-                    4 -> {
-                        adapter.updateProductList(Common.getChairsList())
-                        toolbarTitleTxt.text = "Chairs"
-                    }
-                }
-            }
-        }
-    }*/
-
     fun takePicture() {
         val snackbar = Snackbar.make(findViewById(android.R.id.content),
                 "Photo saved", Snackbar.LENGTH_LONG)
         takePicturesViewModel.takePhoto(arFragment.arSceneView, snackbar, getPackageName())
+    }
+
+    fun listenMenuSelection() {
+        menuOptionSelectedLiveData.observe(this, Observer<Int> { menuOptionSelected ->
+            when(menuOptionSelected) {
+                1 -> {
+                    adapter.updateProductList(Common.getBathroomsList())
+                    toolbarTitleTxt.text = "Bathrooms"
+                }
+                2 -> {
+                    adapter.updateProductList(Common.getBedsList())
+                    toolbarTitleTxt.text = "Beds"
+                }
+                3 -> {
+                    adapter.updateProductList(Common.getCasesList())
+                    toolbarTitleTxt.text = "Cases"
+                }
+                4 -> {
+                    adapter.updateProductList(Common.getChairsList())
+                    toolbarTitleTxt.text = "Chairs"
+                }
+            }
+        })
     }
 
     override fun onModelItemClick(modelName: String) {

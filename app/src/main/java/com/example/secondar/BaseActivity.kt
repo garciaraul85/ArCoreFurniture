@@ -19,7 +19,7 @@ open class BaseActivity: AppCompatActivity() {
     lateinit var contextMenuDialogFragment: ContextMenuDialogFragment
     lateinit var toolbarTitleTxt: TextView
 
-    private lateinit var menuViewModel: MenuViewModel
+    lateinit var menuViewModel: MenuViewModel
     lateinit var menuParams: MenuParams
 
     private val menuOptionSelectedMutableLiveData = MutableLiveData<Int>()
@@ -120,7 +120,7 @@ open class BaseActivity: AppCompatActivity() {
         contextMenuDialogFragment = ContextMenuDialogFragment.newInstance(menuParams).apply {
             menuItemClickListener = { _, position ->
                 toolbarTitleTxt.text = menu[position].title
-                menuOptionSelectedMutableLiveData.value = position
+                menuOptionSelectedMutableLiveData.value = (position - 1)
             }
         }
     }

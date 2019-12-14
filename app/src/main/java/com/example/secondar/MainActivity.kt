@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,7 +14,6 @@ import com.example.secondar.gestures.CustomGestureDetector
 import com.example.secondar.gestures.CustomOnGestureListener
 import com.example.secondar.gestures.IGesture
 import com.example.secondar.models.Product
-import com.example.secondar.repository.Common
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.ar.core.HitResult
@@ -26,7 +24,6 @@ import com.google.ar.sceneform.Scene
 import com.google.ar.sceneform.assets.RenderableSource
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.ux.ArFragment
-import com.yalantis.contextmenu.lib.ContextMenuDialogFragment
 
 class MainActivity : BaseActivity(), IFurniture, IGesture {
     private lateinit var arFragment: ArFragment
@@ -192,9 +189,9 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
 
     private fun initiateRecyclerView() {
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
+        recyclerView = findViewById(R.id.recyclerview)
         recyclerView.layoutManager = layoutManager
-        adapter = RecyclerViewAdapter(Common.getBathroomsList(), this)
+        adapter = RecyclerViewAdapter(this.menuViewModel.getProductsFromCategory(0), this)
         recyclerView.adapter = adapter
     }
 
@@ -206,23 +203,9 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
 
     fun listenMenuSelection() {
         menuOptionSelectedLiveData.observe(this, Observer<Int> { menuOptionSelected ->
-            when(menuOptionSelected) {
-                1 -> {
-                    adapter.updateProductList(Common.getBathroomsList())
-                    toolbarTitleTxt.text = "Bathrooms"
-                }
-                2 -> {
-                    adapter.updateProductList(Common.getBedsList())
-                    toolbarTitleTxt.text = "Beds"
-                }
-                3 -> {
-                    adapter.updateProductList(Common.getCasesList())
-                    toolbarTitleTxt.text = "Cases"
-                }
-                4 -> {
-                    adapter.updateProductList(Common.getChairsList())
-                    toolbarTitleTxt.text = "Chairs"
-                }
+            if (menuOptionSelected >= 0) {
+                adapter.updateProductList(this.menuViewModel.getProductsFromCategory(menuOptionSelected))
+                toolbarTitleTxt.text = this.menuViewModel.categoriesList[menuOptionSelected].name
             }
         })
     }

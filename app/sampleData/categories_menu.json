@@ -5,12 +5,12 @@
       "icon": "icn_1",
       "products": [
         {
-          "name": "Sink",
+          "name": "Sink01",
           "icon": "table",
           "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/bathrooms/sink1/sink01.gltf"
         },
         {
-          "name": "Shower",
+          "name": "Shower01",
           "icon": "bookshelf",
           "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/bathrooms/shower1/shower01.gltf"
         }
@@ -26,7 +26,7 @@
           "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/beds/bed1/bed01.gltf"
         },
         {
-          "name": "Shower",
+          "name": "Bed04",
           "icon": "odltv",
           "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/beds/bed4/bed04.gltf"
         }
@@ -37,12 +37,12 @@
       "icon": "icn_3",
       "products": [
         {
-          "name": "Bed01",
+          "name": "Bookshelf01",
           "icon": "clothdryer",
           "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/cases/bookshelf1/bookshelf01.gltf"
         },
         {
-          "name": "Shower",
+          "name": "Bookcase02",
           "icon": "chair",
           "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/cases/bookcase2/bookcase2.gltf"
         }

@@ -14,6 +14,7 @@ import com.example.secondar.gestures.CustomGestureDetector
 import com.example.secondar.gestures.CustomOnGestureListener
 import com.example.secondar.gestures.IGesture
 import com.example.secondar.models.Product
+import com.example.secondar.repository.Common
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.ar.core.HitResult
@@ -191,7 +192,7 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         recyclerView = findViewById(R.id.recyclerview)
         recyclerView.layoutManager = layoutManager
-        adapter = RecyclerViewAdapter(this.menuViewModel.getProductsFromCategory(0), this)
+        adapter = RecyclerViewAdapter(Common.getBathroomsList(), this)
         recyclerView.adapter = adapter
     }
 
@@ -203,7 +204,7 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
 
     fun listenMenuSelection() {
         menuOptionSelectedLiveData.observe(this, Observer<Int> { menuOptionSelected ->
-            if (menuOptionSelected >= 0) {
+            if (menuOptionSelected >= 0 && this.menuViewModel.categoriesList.isNotEmpty()) {
                 adapter.updateProductList(this.menuViewModel.getProductsFromCategory(menuOptionSelected))
                 toolbarTitleTxt.text = this.menuViewModel.categoriesList[menuOptionSelected].name
             }

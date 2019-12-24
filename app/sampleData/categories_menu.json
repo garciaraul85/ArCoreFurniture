@@ -2,7 +2,7 @@
   "category" : [
     {
       "name": "Bathroom",
-      "icon": "icn_1",
+      "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
       "products": [
         {
           "name": "Sink01",
@@ -18,7 +18,7 @@
     },
     {
       "name": "Beds",
-      "icon": "icn_2",
+      "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
       "products": [
         {
           "name": "Bed01",
@@ -34,7 +34,7 @@
     },
     {
       "name": "Cases",
-      "icon": "icn_3",
+      "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
       "products": [
         {
           "name": "Bookshelf01",
@@ -50,7 +50,7 @@
     },
     {
       "name": "Tables",
-      "icon": "icn_4",
+      "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
       "products": [
         {
           "name": "Table01",

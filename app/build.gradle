@@ -70,6 +70,8 @@ dependencies {
     //https://github.com/square/okhttp
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+
+    implementation "com.github.skydoves:powermenu:2.1.2"
 }
 
 sceneform.asset('sampleData/model.obj',

@@ -1,12 +1,21 @@
 package com.example.secondar
 
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.*
 import com.example.secondar.feature.menu.MenuViewModel
+import com.example.secondar.feature.menu.utils.MoreMenuFactory
+import com.example.secondar.feature.menu.utils.PowerMenuUtils
+import com.skydoves.powermenu.OnMenuItemClickListener
+import com.skydoves.powermenu.PowerMenu
+import com.skydoves.powermenu.PowerMenuItem
+import com.skydoves.powermenu.kotlin.powerMenu
 import com.yalantis.contextmenu.lib.ContextMenuDialogFragment
 import com.yalantis.contextmenu.lib.MenuParams
 import com.yalantis.contextmenu.lib.MenuObject
@@ -15,16 +24,17 @@ import kotlinx.android.synthetic.main.toolbar.*
 open class BaseActivity: AppCompatActivity() {
 
     private lateinit var mContext: BaseActivity
-    private lateinit var mTopToolbar: Toolbar
     lateinit var contextMenuDialogFragment: ContextMenuDialogFragment
     lateinit var toolbarTitleTxt: TextView
 
     lateinit var menuViewModel: MenuViewModel
-    lateinit var menuParams: MenuParams
 
     private val menuOptionSelectedMutableLiveData = MutableLiveData<Int>()
     val menuOptionSelectedLiveData: LiveData<Int>
         get() = menuOptionSelectedMutableLiveData
+
+
+    private val moreMenu by powerMenu(MoreMenuFactory::class)
 
     fun initArMenu() {
         toolbarTitleTxt = findViewById(R.id.toolbarTitle)
@@ -32,8 +42,20 @@ open class BaseActivity: AppCompatActivity() {
             MenuViewModel(application)
         }).get(MenuViewModel::class.java)
 
-        initToolbar()
         initMenuFragment()
+    }
+
+    var isShowing: Boolean = false
+    var hamburgerWasClicked: Boolean = false
+    fun onHamburger(view: View) {
+        hamburgerWasClicked = true
+        if (isShowing) {
+            isShowing = false
+            moreMenu.dismiss()
+        } else {
+            isShowing = true
+            moreMenu.showAsDropDown(view)
+        }
     }
 
     override fun onResume() {
@@ -58,24 +80,6 @@ open class BaseActivity: AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun initToolbar() {
-        mTopToolbar = findViewById (R.id.toolbar)
-        setSupportActionBar(mTopToolbar);
-
-        supportActionBar?.apply {
-            setHomeButtonEnabled(true)
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowTitleEnabled(false)
-        }
-
-        toolbar.apply {
-            setNavigationIcon(R.drawable.ic_arrow_back)
-            setNavigationOnClickListener { onBackPressed() }
-        }
-
-        toolbarTitle.text = "PAD"
-    }
-
     override fun onBackPressed() {
         if (::contextMenuDialogFragment.isInitialized && contextMenuDialogFragment.isAdded) {
             contextMenuDialogFragment.dismiss()
@@ -90,39 +94,24 @@ open class BaseActivity: AppCompatActivity() {
         }
     }
 
-    /**
-     * If you want to change the side you need to add 'gravity' parameter,
-     * by default it is MenuGravity.END.
-     *
-     * For example:
-     *
-     * MenuParams(
-     *     actionBarSize = resources.getDimension(R.dimen.tool_bar_height).toInt(),
-     *     menuObjects = getMenuObjects(),
-     *     isClosableOutside = false,
-     *     gravity = MenuGravity.START
-     * )
-     */
     private fun initMenuFragment() {
-        menuViewModel.categoriesLiveData.observe(this, Observer<MutableList<MenuObject>> { menu ->
-            menuParams = MenuParams(
-                    actionBarSize = resources.getDimension(R.dimen.tool_bar_height).toInt(),
-                    menuObjects = menu,
-                    isClosableOutside = false
-            )
-            initContextMenuDialogFragment(menu)
+        menuViewModel.categoriesLiveData.observe(this, Observer<MutableList<PowerMenuItem>> { menu ->
+
+            moreMenu.addItemList(menu)
+
+            moreMenu.setOnMenuItemClickListener { position, item ->
+                if (hamburgerWasClicked) {
+                    isShowing = !isShowing
+                }
+                moreMenu.selectedPosition = position
+
+                toolbarTitleTxt.text = menu[position].title
+                menuOptionSelectedMutableLiveData.value = (position)
+                Toast.makeText(this, item.title, Toast.LENGTH_SHORT).show()
+            }
         })
 
         menuViewModel.getArMenuCategories()
-    }
-
-    private fun initContextMenuDialogFragment(menu: MutableList<MenuObject>) {
-        contextMenuDialogFragment = ContextMenuDialogFragment.newInstance(menuParams).apply {
-            menuItemClickListener = { _, position ->
-                toolbarTitleTxt.text = menu[position].title
-                menuOptionSelectedMutableLiveData.value = (position - 1)
-            }
-        }
     }
 
     protected inline fun <VM : ViewModel> viewModelFactory(crossinline f: () -> VM) =

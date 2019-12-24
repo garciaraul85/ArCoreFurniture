@@ -192,7 +192,7 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         recyclerView = findViewById(R.id.recyclerview)
         recyclerView.layoutManager = layoutManager
-        adapter = RecyclerViewAdapter(Common.getBathroomsList(), this)
+        adapter = RecyclerViewAdapter(this.applicationContext, Common.getBathroomsList(), this)
         recyclerView.adapter = adapter
     }
 

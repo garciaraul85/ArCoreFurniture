@@ -39,7 +39,7 @@ class MenuViewModel(app: Application): AndroidViewModel(app) {
                             println(userResponse.toString())
                             this.categoriesList = userResponse.categoriesList.toMutableList()
                             this.categoriesList.forEach { categories ->
-                                this.categories.add(PowerMenuItem(categories.name))
+                                this.categories.add(PowerMenuItem(categories.name, categories.icon))
                             }
                             this.categories.let {
                                 this.categoriesMutableLiveData.value = this.categories
@@ -58,7 +58,7 @@ class MenuViewModel(app: Application): AndroidViewModel(app) {
     fun getProductsFromCategory(position: Int): MutableList<Product> {
         this.productList.clear()
         this.categoriesList[position].products.forEach { product ->
-            this.productList.add(Product(product.name, R.drawable.table, product.url))
+            this.productList.add(Product(product.name, product.icon, product.url))
         }
         return this.productList
     }

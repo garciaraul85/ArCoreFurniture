@@ -1,25 +1,17 @@
 package com.example.secondar
 
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.*
 import com.example.secondar.feature.menu.MenuViewModel
 import com.example.secondar.feature.menu.utils.MoreMenuFactory
-import com.example.secondar.feature.menu.utils.PowerMenuUtils
-import com.skydoves.powermenu.OnMenuItemClickListener
-import com.skydoves.powermenu.PowerMenu
 import com.skydoves.powermenu.PowerMenuItem
 import com.skydoves.powermenu.kotlin.powerMenu
 import com.yalantis.contextmenu.lib.ContextMenuDialogFragment
-import com.yalantis.contextmenu.lib.MenuParams
-import com.yalantis.contextmenu.lib.MenuObject
-import kotlinx.android.synthetic.main.toolbar.*
 
 open class BaseActivity: AppCompatActivity() {
 

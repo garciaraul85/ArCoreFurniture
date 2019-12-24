@@ -1,5 +1,6 @@
 package com.example.secondar
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,8 +8,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.secondar.models.Product
+import com.squareup.picasso.Picasso
 
-class RecyclerViewAdapter(private val productsList: MutableList<Product>, private val furniture: IFurniture)
+class RecyclerViewAdapter(private val context: Context, private val productsList: MutableList<Product>, private val furniture: IFurniture)
     : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -17,7 +19,7 @@ class RecyclerViewAdapter(private val productsList: MutableList<Product>, privat
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.imageView.setImageResource(productsList[position].imagesPath)
+        Picasso.with(context).load(productsList[position].imagesPath).into(holder.imageView)
         holder.textView.text = productsList[position].textNames
         holder.imageView.setOnClickListener { view -> furniture.onModelItemClick(productsList[position].modelsName) }
     }

@@ -2,11 +2,11 @@
   "category" : [
     {
       "name": "Bathroom",
-      "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
+      "icon": "icn_1",
       "products": [
         {
           "name": "Sink01",
-          "icon": "table",
+          "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
           "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/bathrooms/sink1/sink01.gltf"
         },
         {
@@ -18,48 +18,48 @@
     },
     {
       "name": "Beds",
-      "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
+      "icon": "icn_2",
       "products": [
         {
           "name": "Bed01",
-          "icon": "lamp",
+          "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
           "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/beds/bed1/bed01.gltf"
         },
         {
           "name": "Bed04",
-          "icon": "odltv",
+          "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
           "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/beds/bed4/bed04.gltf"
         }
       ]
     },
     {
       "name": "Cases",
-      "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
+      "icon": "icn_3",
       "products": [
         {
           "name": "Bookshelf01",
-          "icon": "clothdryer",
+          "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
           "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/cases/bookshelf1/bookshelf01.gltf"
         },
         {
           "name": "Bookcase02",
-          "icon": "chair",
+          "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
           "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/cases/bookcase2/bookcase2.gltf"
         }
       ]
     },
     {
       "name": "Tables",
-      "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
+      "icon": "icn_4",
       "products": [
         {
           "name": "Table01",
-          "icon": "clothdryer",
+          "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
           "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/tables/table1/table01.gltf"
         },
         {
           "name": "Table02",
-          "icon": "chair",
+          "icon": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/src/main/res/drawable-v24/table.jpg",
           "url": "https://raw.githubusercontent.com/garciaraul85/ArCoreFurniture/master/app/items/tables/table2/table02.gltf"
         }
       ]

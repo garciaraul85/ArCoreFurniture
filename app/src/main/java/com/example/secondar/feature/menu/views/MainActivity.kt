@@ -1,4 +1,4 @@
-package com.example.secondar
+package com.example.secondar.feature.menu.views
 
 import android.content.Intent
 import android.net.Uri
@@ -9,12 +9,16 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.secondar.feature.ar.viewModels.ArViewModel
+import com.example.secondar.feature.base.BaseActivity
+import com.example.secondar.R
 import com.example.secondar.feature.takepictures.TakePicturesViewModel
 import com.example.secondar.gestures.CustomGestureDetector
 import com.example.secondar.gestures.CustomOnGestureListener
 import com.example.secondar.gestures.IGesture
-import com.example.secondar.models.Product
+import com.example.secondar.feature.menu.models.Product
 import com.example.secondar.repository.Common
+import com.example.secondar.util.PointerDrawable
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.ar.core.HitResult
@@ -31,7 +35,7 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
     private lateinit var btnRemove: Button
     private lateinit var btnTakePicture: FloatingActionButton
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: RecyclerViewAdapter
+    private lateinit var adapter: ProductsAdapter
 
     private val pointer = PointerDrawable()
     private var isTracking: Boolean = false
@@ -192,7 +196,7 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         recyclerView = findViewById(R.id.recyclerview)
         recyclerView.layoutManager = layoutManager
-        adapter = RecyclerViewAdapter(this.applicationContext, Common.getBathroomsList(), this)
+        adapter = ProductsAdapter(this.applicationContext, Common.getBathroomsList(), this)
         recyclerView.adapter = adapter
     }
 

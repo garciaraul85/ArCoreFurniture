@@ -1,4 +1,4 @@
-package com.example.secondar
+package com.example.secondar.feature.menu.views
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,11 +7,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.secondar.models.Product
+import com.example.secondar.R
+import com.example.secondar.feature.menu.models.Product
 import com.squareup.picasso.Picasso
 
-class RecyclerViewAdapter(private val context: Context, private val productsList: MutableList<Product>, private val furniture: IFurniture)
-    : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
+class ProductsAdapter(private val context: Context, private val productsList: MutableList<Product>, private val furniture: IFurniture)
+    : RecyclerView.Adapter<ProductsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.layout_list_item, parent, false)

@@ -1,18 +1,15 @@
-package com.example.secondar.feature.menu
+package com.example.secondar.feature.menu.viewModels
 
 import android.annotation.SuppressLint
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.secondar.R
 import com.example.secondar.feature.menu.data.ApiService
 import com.example.secondar.feature.menu.models.Category
-import com.example.secondar.feature.menu.models.Products
-import com.example.secondar.models.Product
+import com.example.secondar.feature.menu.models.Product
 import com.example.secondar.util.UtilMethods
 import com.skydoves.powermenu.PowerMenuItem
-import com.yalantis.contextmenu.lib.MenuObject
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
@@ -58,7 +55,7 @@ class MenuViewModel(app: Application): AndroidViewModel(app) {
     fun getProductsFromCategory(position: Int): MutableList<Product> {
         this.productList.clear()
         this.categoriesList[position].products.forEach { product ->
-            this.productList.add(Product(product.name, product.icon, product.url))
+            this.productList.add(Product(product.textNames, product.imagesPath, product.modelsName))
         }
         return this.productList
     }

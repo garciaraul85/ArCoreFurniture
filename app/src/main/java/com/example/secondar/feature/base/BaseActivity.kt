@@ -1,4 +1,4 @@
-package com.example.secondar
+package com.example.secondar.feature.base
 
 import android.view.Menu
 import android.view.MenuItem
@@ -7,7 +7,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
-import com.example.secondar.feature.menu.MenuViewModel
+import com.example.secondar.R
+import com.example.secondar.feature.menu.viewModels.MenuViewModel
 import com.example.secondar.feature.menu.utils.MoreMenuFactory
 import com.skydoves.powermenu.PowerMenuItem
 import com.skydoves.powermenu.kotlin.powerMenu

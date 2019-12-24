@@ -1,7 +1,6 @@
 package com.example.secondar.repository
 
-import com.example.secondar.R
-import com.example.secondar.models.Product
+import com.example.secondar.feature.menu.models.Product
 import java.util.ArrayList
 
 object Common {

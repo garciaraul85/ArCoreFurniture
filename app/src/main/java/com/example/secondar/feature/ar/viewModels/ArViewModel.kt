@@ -1,11 +1,11 @@
-package com.example.secondar
+package com.example.secondar.feature.ar.viewModels
 
 import android.graphics.Point
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.secondar.gestures.CustomGestureDetector
-import com.example.secondar.models.Product
+import com.example.secondar.feature.menu.models.Product
 import com.google.ar.core.*
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.Node
@@ -37,7 +37,7 @@ class ArViewModel(val transformationSystem: TransformationSystem, val scene: Sce
     val loadModelLiveData: LiveData<Product>
         get() = loadModelMutableLiveData
 
-    fun addObject(modelName: String, frame: Frame, screenCenter: android.graphics.Point) {
+    fun addObject(modelName: String, frame: Frame, screenCenter: Point) {
         val pt = screenCenter
         val hits: List<HitResult>
         hits = frame.hitTest(pt.x.toFloat(), pt.y.toFloat())

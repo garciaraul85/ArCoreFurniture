@@ -1,32 +1,26 @@
 package com.example.secondar.feature.base
 
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
 import com.example.secondar.R
-import com.example.secondar.feature.menu.viewModels.MenuViewModel
 import com.example.secondar.feature.menu.utils.MoreMenuFactory
+import com.example.secondar.feature.menu.viewModels.MenuViewModel
 import com.skydoves.powermenu.PowerMenuItem
 import com.skydoves.powermenu.kotlin.powerMenu
-import com.yalantis.contextmenu.lib.ContextMenuDialogFragment
 
 open class BaseActivity: AppCompatActivity() {
 
-    private lateinit var mContext: BaseActivity
-    lateinit var contextMenuDialogFragment: ContextMenuDialogFragment
     lateinit var toolbarTitleTxt: TextView
 
     lateinit var menuViewModel: MenuViewModel
-
     private val menuOptionSelectedMutableLiveData = MutableLiveData<Int>()
     val menuOptionSelectedLiveData: LiveData<Int>
         get() = menuOptionSelectedMutableLiveData
 
-
+    var isShowing: Boolean = false
+    var hamburgerWasClicked: Boolean = false
     private val moreMenu by powerMenu(MoreMenuFactory::class)
 
     fun initArMenu() {
@@ -38,8 +32,7 @@ open class BaseActivity: AppCompatActivity() {
         initMenuFragment()
     }
 
-    var isShowing: Boolean = false
-    var hamburgerWasClicked: Boolean = false
+
     fun onHamburger(view: View) {
         hamburgerWasClicked = true
         if (isShowing) {
@@ -48,42 +41,6 @@ open class BaseActivity: AppCompatActivity() {
         } else {
             isShowing = true
             moreMenu.showAsDropDown(view)
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        mContext = this
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        item?.let {
-            when (it.itemId) {
-                R.id.context_menu -> {
-                    showContextMenuDialogFragment()
-                }
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onBackPressed() {
-        if (::contextMenuDialogFragment.isInitialized && contextMenuDialogFragment.isAdded) {
-            contextMenuDialogFragment.dismiss()
-        } else {
-            finish()
-        }
-    }
-
-    private fun showContextMenuDialogFragment() {
-        if (supportFragmentManager.findFragmentByTag(ContextMenuDialogFragment.TAG) == null) {
-            contextMenuDialogFragment.show(supportFragmentManager, ContextMenuDialogFragment.TAG)
         }
     }
 
@@ -100,7 +57,6 @@ open class BaseActivity: AppCompatActivity() {
 
                 toolbarTitleTxt.text = menu[position].title
                 menuOptionSelectedMutableLiveData.value = (position)
-                Toast.makeText(this, item.title, Toast.LENGTH_SHORT).show()
             }
         })
 

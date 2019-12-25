@@ -1,44 +1,34 @@
 package com.example.secondar.util
 
-import android.app.AlertDialog
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Build
-import android.util.Log
+import android.view.View
+import android.view.Window
+import android.view.WindowManager
+import android.widget.ProgressBar
 import android.widget.Toast
-import com.example.secondar.R
 
 object UtilMethods {
-
-    private lateinit var progressDialogBuilder: AlertDialog.Builder
-    private lateinit var progressDialog: AlertDialog
-
-    private val TAG: String = "---UtilMethods"
 
     /**
      * @param context
      * @action show progress loader
      */
-    fun showLoading(context: Context){
-        progressDialogBuilder = AlertDialog.Builder(context)
-        progressDialogBuilder.setCancelable(false) // if you want user to wait for some process to finish,
-        progressDialogBuilder.setView(R.layout.layout_loading_dialog)
-
-        progressDialog = progressDialogBuilder.create()
-        progressDialog.show()
+    fun showLoading(window: Window, progressBar: ProgressBar) {
+        window.setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        progressBar.visibility = View.VISIBLE
     }
 
     /**
      * @action hide progress loader
      */
-    fun hideLoading(){
-        try {
-            progressDialog.dismiss()
-        }catch (ex: java.lang.Exception){
-            Log.e(TAG, ex.toString())
-        }
-
+    fun hideLoading(window: Window, progressBar: ProgressBar) {
+        window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        progressBar.visibility = View.GONE
     }
 
     /**

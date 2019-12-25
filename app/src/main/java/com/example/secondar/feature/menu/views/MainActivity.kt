@@ -1,24 +1,26 @@
 package com.example.secondar.feature.menu.views
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.secondar.R
 import com.example.secondar.feature.ar.viewModels.ArViewModel
 import com.example.secondar.feature.base.BaseActivity
-import com.example.secondar.R
+import com.example.secondar.feature.menu.models.Product
 import com.example.secondar.feature.takepictures.TakePicturesViewModel
 import com.example.secondar.gestures.CustomGestureDetector
 import com.example.secondar.gestures.CustomOnGestureListener
 import com.example.secondar.gestures.IGesture
-import com.example.secondar.feature.menu.models.Product
-import com.example.secondar.repository.Common
 import com.example.secondar.util.PointerDrawable
+import com.example.secondar.util.UtilMethods
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.ar.core.HitResult
@@ -35,6 +37,7 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
     private lateinit var btnRemove: Button
     private lateinit var btnTakePicture: FloatingActionButton
     private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
     private lateinit var adapter: ProductsAdapter
 
     private val pointer = PointerDrawable()
@@ -50,11 +53,14 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        progressBar = findViewById(R.id.progressBar)
+
         initArMenu()
         listenMenuSelection()
         viewModelAndArCoreSetup()
         arCorListenersSetup()
         btnSetup()
+        initiateRecyclerView()
         modelsAnchorsAndNodesObserver()
         takePicturesObserver()
     }
@@ -85,12 +91,14 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
         }
     }
 
+    @SuppressLint("RestrictedApi")
     private fun btnSetup() {
         btnRemove = findViewById(R.id.remove)
         btnTakePicture = findViewById(R.id.takePicture)
-        initiateRecyclerView()
-
-        btnRemove.setOnClickListener { view -> arViewModel.removeAllModels() }
+        btnRemove.setOnClickListener { view ->
+            arViewModel.removeAllModels()
+            btnRemove.visibility = View.GONE
+        }
         btnTakePicture.setOnClickListener { view -> takePicture() }
     }
 
@@ -100,6 +108,7 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
         })
     }
 
+    @SuppressLint("RestrictedApi")
     private fun modelsAnchorsAndNodesObserver() {
         arViewModel.setNodeNameLiveData.observe(this, Observer<Long> { key ->
             gestureListener.nodeList[key] = gestureListener.nodeList.size
@@ -109,14 +118,16 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
         })
         arViewModel.removeNodeNameLiveData.observe(this, Observer<Long> { nodeIndexToDelete ->
             gestureListener.nodeList.remove(nodeIndexToDelete)
+            if (gestureListener.nodeList.isEmpty()) {
+                btnRemove.visibility = View.GONE
+            }
         })
         arViewModel.loadModelLiveData.observe(this, Observer<Product> { product ->
-            System.out.println("_xyz loadModelLiveData.observe")
             if (product.modelsName.startsWith("https")) {
                 ModelRenderable
                         .builder()
                         .setSource(
-                                this,
+                        this,
                                 RenderableSource
                                         .builder()
                                         .setSource(this, Uri.parse(product.modelsName), RenderableSource.SourceType.GLTF2)
@@ -128,8 +139,11 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
                         .build()
                         .thenAccept { modelRenderable ->
                             arViewModel.addAnchorToScene(product.anchor, modelRenderable)
+                            UtilMethods.hideLoading(window, progressBar)
+                            btnRemove.visibility = View.VISIBLE
                         }
                         .exceptionally { throwable ->
+                            UtilMethods.hideLoading(window, progressBar)
                             null
                         }
             } else {
@@ -137,8 +151,13 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
                         .setSource(this, Uri.parse(product.modelsName))
                         .setRegistryId(product.modelsName)
                         .build()
-                        .thenAccept { modelRenderable -> arViewModel.addAnchorToScene(product.anchor, modelRenderable) }
+                        .thenAccept { modelRenderable ->
+                            arViewModel.addAnchorToScene(product.anchor, modelRenderable)
+                            UtilMethods.hideLoading(window, progressBar)
+                            btnRemove.visibility = View.VISIBLE
+                        }
                         .exceptionally { throwable ->
+                            UtilMethods.hideLoading(window, progressBar)
                             null
                         }
             }
@@ -196,7 +215,7 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         recyclerView = findViewById(R.id.recyclerview)
         recyclerView.layoutManager = layoutManager
-        adapter = ProductsAdapter(this.applicationContext, Common.getBathroomsList(), this)
+        adapter = ProductsAdapter(this.applicationContext, mutableListOf(),this)
         recyclerView.adapter = adapter
     }
 
@@ -217,7 +236,10 @@ class MainActivity : BaseActivity(), IFurniture, IGesture {
 
     override fun onModelItemClick(modelName: String) {
         val frame = arFragment.arSceneView.arFrame
-        frame?.let { arViewModel.addObject(modelName, it, screenCenter) }
+        frame?.let {
+            UtilMethods.showLoading(window, progressBar)
+            arViewModel.addObject(modelName, it, screenCenter)
+        }
     }
 
     override fun onLongPressItem() {
